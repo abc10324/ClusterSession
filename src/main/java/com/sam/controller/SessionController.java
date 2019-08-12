@@ -24,7 +24,7 @@ public class SessionController {
 	public Object getSessionAttribute(@SessionAttribute(name="sessionAttr") String attr) {
 		
 		return attr != null 
-			 ? ResponseEntity.status(200).body("attr = " + attr)
+			 ? ResponseEntity.status(200).body("from server 2 , attr = " + attr)
 			 : ResponseEntity.status(400).body("failure");
 	}
 	
