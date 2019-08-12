@@ -20,7 +20,9 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.session.web.context.AbstractHttpSessionApplicationInitializer;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.view.BeanNameViewResolver;
 
 @Configuration
 @EnableWebMvc
@@ -88,5 +90,11 @@ public class SpringJavaConfig extends AbstractHttpSessionApplicationInitializer{
 		RedisTemplate<String, Object> template = new RedisTemplate<String, Object>();
 		template.setConnectionFactory(connectionFactory());
 		return template;
+	}
+	
+	// view resolver setting
+	@Bean
+	public ViewResolver viewResolver() {
+		return new BeanNameViewResolver();
 	}
 }

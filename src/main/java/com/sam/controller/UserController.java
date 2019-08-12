@@ -14,19 +14,21 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.sam.model.User;
 import com.sam.model.service.UserService;
 
-@RestController
+@Controller
 @Validated
 public class UserController {
 
@@ -34,6 +36,7 @@ public class UserController {
 	private UserService userService;
 	
 	@PostMapping("/Regist")
+	@ResponseBody
 	public Object regist(@Valid @RequestBody User user){
 		System.out.println(user);
 		User result = userService.addUser(user);
@@ -47,7 +50,30 @@ public class UserController {
 			  .body(Collections.singletonMap("error", "user already existed"));
 	}
 	
+	@GetMapping("/Regist")
+	public String registPage() {
+		return "regist";
+	}
+	
+	@GetMapping("/Login")
+	public String getLoginPage() {
+		return "login";
+	}
+	
+	@PostMapping("/Login")
+	public String login(String id, Model model) {
+		User result = userService.findUser(id);
+		
+		if(result != null) {
+			return "index";
+		} else {
+			model.addAttribute("errorMsg", "user not existed");
+			return "login";
+		}
+	}
+	
 	@GetMapping("/User")
+	@ResponseBody
 	public Object findUser(@NotBlank String id){
 		User result = userService.findUser(id);
 		
@@ -58,6 +84,7 @@ public class UserController {
 	}
 	
 	@GetMapping("/Users")
+	@ResponseBody
 	public Object findUsers(){
 		List<User> result = userService.findAll();
 		
@@ -68,6 +95,7 @@ public class UserController {
 	}
 	
 	@GetMapping("/Test")
+	@ResponseBody
 	public Map<String,Object> test(){
 		
 		Map<String,Object> map = new HashMap<String, Object>();
@@ -79,6 +107,7 @@ public class UserController {
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
+	@ResponseBody
 	public Map<String, Object> handleValidationExceptions(
 	  MethodArgumentNotValidException ex) {
 	    Map<String, Object> errors = new HashMap<>();
@@ -94,6 +123,7 @@ public class UserController {
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(ConstraintViolationException.class)
+	@ResponseBody
 	public Map<String, Object> handleParameterValidationExceptions(
 			ConstraintViolationException ex) {
 	    Map<String, Object> errors = new HashMap<>();

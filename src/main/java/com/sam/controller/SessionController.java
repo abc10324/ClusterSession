@@ -13,10 +13,15 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 @SessionAttributes(names="sessionAttr")
 public class SessionController {
 	
+	@GetMapping("/SessionTest")
+	public String getSessionTestPage() {
+		return "sessionTest";
+	}
+	
 	@PostMapping("/Attr")
 	public String setSessionAttribute(String name,Model model) {
 		model.addAttribute("sessionAttr", name);
-		return "/index.jsp";
+		return "sessionTest";
 	}
 	
 	@GetMapping("/Attr")
