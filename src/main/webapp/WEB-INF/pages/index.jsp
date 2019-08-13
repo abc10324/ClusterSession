@@ -8,7 +8,15 @@
 <title>Index</title>
 </head>
 <body>
-	<h2>Index</h2>
+	<c:choose>
+		<c:when test="${empty userInfo}">
+			<h2>Index</h2>
+		</c:when>
+		<c:otherwise>
+			<h2>Hello ${userInfo.name}</h2>		
+		</c:otherwise>
+	</c:choose>
+	
 	
 	<a href="<c:url value="/SessionTest"/>">
 		<button>To Session Test Page</button>
@@ -25,8 +33,16 @@
 	</a>
 	<br/>
 	<br/>
-	<a href="<c:url value="#"/>">
-		<button>To WebSocket Test Page</button>
+	<a href="<c:url value="/Logout"/>">
+		<button>Logout</button>
 	</a>
+	<br/>
+	<br/>
+	<c:if test="${not empty userInfo}">
+		<a href="<c:url value="/WebSocketTest"/>">
+			<button>To WebSocket Test Page</button>
+		</a>
+	</c:if>
+	
 </body>
 </html>

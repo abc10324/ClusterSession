@@ -54,6 +54,12 @@ dependencies {
 	// https://mvnrepository.com/artifact/redis.clients/jedis
 	compile group: 'redis.clients', name: 'jedis', version: '2.9.0'
 	
+	// https://mvnrepository.com/artifact/org.springframework/spring-messaging
+	compile group: 'org.springframework', name: 'spring-messaging', version: '4.3.20.RELEASE'
+	
+	// https://mvnrepository.com/artifact/org.springframework/spring-websocket
+	compile group: 'org.springframework', name: 'spring-websocket', version: '4.3.20.RELEASE'
+	
 	// https://mvnrepository.com/artifact/org.springframework/spring-webmvc
 	compile group: 'org.springframework', name: 'spring-webmvc', version: '4.3.20.RELEASE'
 

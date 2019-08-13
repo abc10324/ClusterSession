@@ -24,12 +24,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 
 import com.sam.model.User;
 import com.sam.model.service.UserService;
 
 @Controller
 @Validated
+@SessionAttributes(names="userInfo")
 public class UserController {
 
 	@Autowired
@@ -65,11 +68,18 @@ public class UserController {
 		User result = userService.findUser(id);
 		
 		if(result != null) {
+			model.addAttribute("userInfo",result);
 			return "index";
 		} else {
 			model.addAttribute("errorMsg", "user not existed");
 			return "login";
 		}
+	}
+	
+	@GetMapping("/Logout")
+	public String logout(Model model,SessionStatus status) {
+		status.setComplete();
+		return "indexRedirect";
 	}
 	
 	@GetMapping("/User")
