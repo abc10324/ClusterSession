@@ -8,7 +8,7 @@ Spring MVC integrated with Spring Session , use Redis DB as storage , prepared f
  > Database: Redis + MySQL  
 
 ## Function  
- > Entry point : <url>/ClusterSession/  
+ > Entry point : \<url\>/ClusterSession/  
  > User system (Regist/Login/Logout)  
  > Chat room (Broadcast & p2p)  
  > Cluster Session test  
