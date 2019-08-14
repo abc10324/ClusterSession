@@ -21,6 +21,7 @@ public class WebSocketConfig extends AbstractSessionWebSocketMessageBrokerConfig
 	@Override
 	protected void configureStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/chat")
+		.setAllowedOrigins("*")
 		.addInterceptors(new HttpSessionHandshakeInterceptor()) // for catching attribute in session scope
 		.setHandshakeHandler(new CustomHandshakeHandler())
 		.withSockJS();

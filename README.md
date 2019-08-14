@@ -3,9 +3,15 @@ Spring MVC integrated with Spring Session , use Redis DB as storage , prepared f
   
 ## Environment  
  > Project: Gradle  
- > Framework: Spring MVC + Spring Data Redis + Spring Session  
+ > Framework: Spring MVC + Spring Data Redis + Spring Data JPA + Spring Session + Spring WebSocket  
  > Server: Tomcat v9.0  
- > Database: Redis  
+ > Database: Redis + MySQL  
+
+## Function  
+ > Entry point : <url>/ClusterSession/  
+ > User system (Regist/Login/Logout)  
+ > Chat room (Broadcast & p2p)  
+ > Cluster Session test  
 
 ## how to use gradleDeploy.bat and gradleDebugDeploy.bat  
  1.set environment variable TOMCAT_HOME to your tomcat install location (ex:D:\apache-tomcat-9.0.22)  

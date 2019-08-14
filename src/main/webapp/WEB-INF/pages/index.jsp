@@ -28,21 +28,25 @@
 	</a>
 	<br/>
 	<br/>
-	<a href="<c:url value="/Login"/>">
-		<button>To User Login Page</button>
-	</a>
-	<br/>
-	<br/>
-	<a href="<c:url value="/Logout"/>">
-		<button>Logout</button>
-	</a>
-	<br/>
-	<br/>
-	<c:if test="${not empty userInfo}">
-		<a href="<c:url value="/WebSocketTest"/>">
-			<button>To WebSocket Test Page</button>
-		</a>
-	</c:if>
+	<c:choose>
+		<c:when test="${empty userInfo}">
+			<a href="<c:url value="/Login"/>">
+				<button>Login</button>
+			</a>
+			<br/>
+			<br/>
+		</c:when>
+		<c:otherwise>
+			<a href="<c:url value="/Logout"/>">
+				<button>Logout</button>
+			</a>
+			<br/>
+			<br/>	
+			<a href="<c:url value="/WebSocketTest"/>">
+				<button>To WebSocket Test Page</button>
+			</a>
+		</c:otherwise>
+	</c:choose>
 	
 </body>
 </html>

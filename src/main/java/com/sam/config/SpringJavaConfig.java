@@ -26,7 +26,7 @@ import org.springframework.web.servlet.view.BeanNameViewResolver;
 
 @Configuration
 @EnableWebMvc
-@EnableRedisHttpSession
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds=60)
 @EnableJpaRepositories(basePackages="com.sam.model.dao")
 @ComponentScan(basePackages="com.sam")
 public class SpringJavaConfig extends AbstractHttpSessionApplicationInitializer{
