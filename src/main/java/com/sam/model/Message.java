@@ -1,5 +1,6 @@
 package com.sam.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -7,7 +8,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 @Data
-public class Message {
+public class Message implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	private String from;
 	private String to;
 	private String msg;

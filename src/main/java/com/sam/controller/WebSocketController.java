@@ -7,7 +7,9 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpUser;
@@ -17,9 +19,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.socket.messaging.SessionConnectEvent;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import com.sam.config.websocket.MessagePublisher;
 import com.sam.model.Message;
+import com.sam.model.OnlineUser;
 import com.sam.model.User;
+import com.sam.model.dao.OnlineUserRepo;
 
 @Controller
 @SessionAttributes(names="userInfo")
@@ -30,6 +37,14 @@ public class WebSocketController {
 	
 	@Autowired
 	private SimpUserRegistry simpUserRegistry;
+	
+	@Autowired
+	private MessagePublisher messagePublisher;
+	
+	@Autowired
+	private OnlineUserRepo onlineUserRepo;
+	
+	private Logger logger = Logger.getLogger(WebSocketController.class);
 	
 	private String serverName;
 	
@@ -46,28 +61,57 @@ public class WebSocketController {
 	}
 	
 	@MessageMapping("/chat")
-	public void messaging(@RequestBody Message msg) {
+	public void messagingToRedis(@RequestBody Message msg) {
 		msg.setServerName(serverName);
+		msg.setTime(new Date(System.currentTimeMillis()));
 		
-		if("userLogin".equals(msg.getMsg())
-			|| "userLogout".equals(msg.getMsg())) {
-			List<String> onlineUserList = new ArrayList<String>();
-			onlineUserList.add("All");
-			
-			for(SimpUser simpUser : simpUserRegistry.getUsers())
-				onlineUserList.add(simpUser.getName());
-			
-			simpMessagingTemplate.convertAndSend("/topic/userList", onlineUserList);
-		} else if("All".equals(msg.getTo())) {
+		if(!"userLogin".equals(msg.getMsg()) && !"userLogout".equals(msg.getMsg()))
+			messagePublisher.publish(msg); // publish to Redis
+	}
+	
+	
+	// called by Redis message subscriber
+	public void messaging(Message msg) {
+		
+		if("All".equals(msg.getTo())) {
 			msg.setFrom(msg.getFrom() + " (Broadcast) ");
-			msg.setTime(new Date(System.currentTimeMillis()));
 			simpMessagingTemplate.convertAndSend("/topic/messages", msg);
 		} else {
-			msg.setTime(new Date(System.currentTimeMillis()));
 			simpMessagingTemplate.convertAndSendToUser(msg.getFrom(), "/queue/messages", msg);
 			simpMessagingTemplate.convertAndSendToUser(msg.getTo(), "/queue/messages", msg);
 		}
 		
 	}
+	
+	public void updateUserList() {
+		List<String> onlineUserList = new ArrayList<String>();
+		onlineUserRepo.findAll().forEach((user) -> {
+			if(user != null)
+				onlineUserList.add(user.getName());
+		});
+		
+		messagePublisher.publish(onlineUserList); // publish to Redis
+	}
+	
+	// called by Redis userSet subscriber
+	public void sendUserList(List<String> onlineUserList) {
+		onlineUserList.add("All");
+		simpMessagingTemplate.convertAndSend("/topic/userList", onlineUserList);
+	}
+	
+	@EventListener
+	public void onConnectEvent(SessionConnectEvent event) {
+		logger.info("Client with username " + event.getUser().getName() +" connected");
+	    onlineUserRepo.save(new OnlineUser(event.getUser().getName()));
+	    updateUserList();
+	}
+	
+	@EventListener
+	public void onDisconnectEvent(SessionDisconnectEvent event) {
+		logger.info("Client with username " + event.getUser().getName() +" disconnected");
+	    onlineUserRepo.delete(event.getUser().getName());
+	    updateUserList();
+	}
+	
 	
 }
