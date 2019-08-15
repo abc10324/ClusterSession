@@ -87,7 +87,7 @@ public class SpringJavaConfig extends AbstractHttpSessionApplicationInitializer{
 	@Bean
 	public RedisConnectionFactory connectionFactory() {
 		JedisConnectionFactory factory = new JedisConnectionFactory();
-		factory.setHostName("172.30.64.33");
+		factory.setHostName("localhost");
 		factory.setPort(6379);
 		factory.setDatabase(0); // default is DB0
 		

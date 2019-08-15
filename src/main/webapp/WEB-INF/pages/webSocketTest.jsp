@@ -30,8 +30,10 @@
                         showMessageOutput(JSON.parse(messageOutput.body));
                     });
                     
-                    stompClient.send("/app/chat", {}, JSON.stringify({'msg':'userLogin'}));
+                   	stompClient.send("/app/chat", {}, JSON.stringify({'msg':'userLogin'}));
                 });
+                
+                
             }
              
             function disconnect() {

@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpUser;
@@ -65,7 +66,9 @@ public class WebSocketController {
 		msg.setServerName(serverName);
 		msg.setTime(new Date(System.currentTimeMillis()));
 		
-		if(!"userLogin".equals(msg.getMsg()) && !"userLogout".equals(msg.getMsg()))
+		if("userLogin".equals(msg.getMsg()) || "userLogout".equals(msg.getMsg()))
+			updateUserList();
+		else
 			messagePublisher.publish(msg); // publish to Redis
 	}
 	
@@ -85,6 +88,8 @@ public class WebSocketController {
 	
 	public void updateUserList() {
 		List<String> onlineUserList = new ArrayList<String>();
+		onlineUserList.add("All");
+		
 		onlineUserRepo.findAll().forEach((user) -> {
 			if(user != null)
 				onlineUserList.add(user.getName());
@@ -95,15 +100,13 @@ public class WebSocketController {
 	
 	// called by Redis userSet subscriber
 	public void sendUserList(List<String> onlineUserList) {
-		onlineUserList.add("All");
 		simpMessagingTemplate.convertAndSend("/topic/userList", onlineUserList);
 	}
 	
 	@EventListener
-	public void onConnectEvent(SessionConnectEvent event) {
+	public void onConnectEvent(SessionConnectEvent event) { // subscription might not finished yet
 		logger.info("Client with username " + event.getUser().getName() +" connected");
 	    onlineUserRepo.save(new OnlineUser(event.getUser().getName()));
-	    updateUserList();
 	}
 	
 	@EventListener
